@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nhập Liệu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: rgb(242, 242, 242); /* 95% trắng + 5% đen */
+        }
+        h1, h2 {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .container {
+            margin: 0 auto;
+            background-color: rgb(242, 242, 242); /* 95% trắng + 5% đen */
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: #FFFFFF; /* Trắng 100% */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+            background-color: #FFFFFF; /* Trắng 100% cho các ô trong bảng */
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            width: auto;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .message {
+            text-align: center;
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 0.9em;
+            display: none;
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .counter {
+            color: black;
+            background-color: white;
+            border: 2px solid red;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .title-group {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            cursor: pointer; /* Thêm con trỏ để người dùng biết có thể nhấn */
+        }
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0056b3;
+            padding: 10px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .logo .highlight {
+            color: #00FF00; /* Màu xanh cho chữ "i" */
+        }
+        .header-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 20px;
+            }
+            h1, h2 {
+                font-size: 2em;
+            }
+            .input-group label {
+                font-size: 1em;
+            }
+            .input-group input {
+                font-size: 1em;
+            }
+            button {
+                width: auto;
+                margin: 5px;
+            }
+            table {
+                font-size: 1em;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        /* Mobile Design */
+        @media (max-width: 767px) {
+            .container {
+                padding: 10px;
+                margin: 0;
+                width: 100%;
+            }
+            h1, h2 {
+                font-size: 1.2em;
+            }
+            .title-group {
+                text-align: center;
+                width: 100%;
+            }
+            table {
+                font-size: 0.8em;
+            }
+            th, td {
+                padding: 4px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-title {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Trang Nhập Liệu -->
+    <div id="inputPage" class="container">
+        <div class="header">
+            <div class="logo">w<span class="highlight">i</span>stron</div>
+            <div class="header-title">Nhập Phế Liệu</div>
+        </div>
+        <div class="input-group">
+            <label for="timeIn">Thời Gian Vào (Ngày/Tháng/Năm Giờ:Phút):</label>
+            <input type="datetime-local" id="timeIn" required>
+        </div>
+        <div class="input-group">
+            <label for="timeOut">Thời Gian Ra (Ngày/Tháng/Năm Giờ:Phút):</label>
+            <input type="datetime-local" id="timeOut" required>
+        </div>
+        <div class="input-group">
+            <label for="licensePlate">Biển Số Xe:</label>
+            <input type="text" id="licensePlate" required>
+        </div>
+        <div class="input-group">
+            <label for="materialName">Tên Phế Liệu:</label>
+            <input type="text" id="materialName" required>
+        </div>
+        <div class="input-group">
+            <label for="emptyWeight">Khối Lượng Xe Không (kg):</label>
+            <input type="number" id="emptyWeight" required>
+        </div>
+        <div class="input-group">
+            <label for="totalWeight">Khối Lượng Tổng (kg):</label>
+            <input type="number" id="totalWeight" required>
+        </div>
+        <div class="input-group">
+            <label for="materialWeight">Trọng Lượng Hàng (kg):</label>
+            <input type="number" id="materialWeight" readonly>
+        </div>
+        <div class="input-group">
+            <label for="supervisor">Người Giám Sát:</label>
+            <input type="text" id="supervisor" required>
+        </div>
+        <div id="errorMessage" class="error">Khối lượng tổng không được nhỏ hơn khối lượng xe không!</div>
+        <div class="button-group">
+            <button onclick="submitData()">Nhập</button>
+            <div class="button-group">
+                <span id="dataCounter" class="counter">0</span>
+                <button onclick="showListPage()">Danh Sách Đã Nhập</button>
+            </div>
+        </div>
+        <div class="footer">© Copyright, Belongs to Namlittle 2025</div>
+    </div>
+
+    <!-- Trang Danh Sách Đã Nhập -->
+    <div id="listPage" class="container" style="display: none;">
+        <div class="header">
+            <div class="logo">w<span class="highlight">i</span>stron</div>
+            <div class="header-title">Nhập Phế Liệu</div>
+        </div>
+        <div class="title-group" onclick="showInputPage()">
+            <h1>回废料井转登记表</h1>
+            <h2>Phiếu Đăng Ký Cân Tài Chế Chất Thải</h2>
+        </div>
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>日期<br>Date</th>
+                        <th>时间进<br>Thời Gian Vào Cân</th>
+                        <th>年号<br>Biển Số Xe</th>
+                        <th>空车重量<br>Khối Lượng Xe Không</th>
+                        <th>图像<br>Image</th>
+                        <th>废料名称<br>Tên Phế Liệu</th>
+                        <th>数量<br>Số lượng</th>
+                        <th>总重量<br>Khối Lượng Tổng</th>
+                        <th>货物重量<br>Khối Lượng Phế Liệu</th>
+                        <th>DVD<br>(Đơn Vị Đo)</th>
+                        <th>图像<br>Image</th>
+                        <th>时间出<br>Thời Gian Ra</th>
+                        <th>日期<br>Date</th>
+                        <th>导师<br>Người giám sát</th>
+                        <th>上午 / 下午<br>Am / Pm</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+        <div id="noDataMessage" class="message" style="display: none;">Hiện tại chưa có mã nào.</div>
+        <div class="button-group">
+            <button onclick="showInputPage()">Trở Về Trang Nhập Liệu</button>
+            <button onclick="downloadExcel()" id="downloadBtn" style="display: none;">Tải Xuống Toàn Bộ Mã</button>
+        </div>
+        <div class="footer">© Copyright, Belongs to Namlittle 2025</div>
+    </div>
+
+    <script>
+        let dataList = [];
+        let lastSupervisor = '';
+
+        // Load data from localStorage when the page loads
+        window.onload = function() {
+            const savedData = localStorage.getItem('dataList');
+            if (savedData) {
+                dataList = JSON.parse(savedData);
+                document.getElementById('dataCounter').textContent = dataList.length;
+                if (dataList.length > 0) {
+                    lastSupervisor = dataList[dataList.length - 1].supervisor;
+                    document.getElementById('supervisor').value = lastSupervisor;
+                }
+            }
+        };
+
+        // Tính toán trọng lượng hàng và kiểm tra lỗi
+        document.getElementById('totalWeight').addEventListener('input', calculateMaterialWeight);
+        document.getElementById('emptyWeight').addEventListener('input', calculateMaterialWeight);
+
+        function calculateMaterialWeight() {
+            const totalWeight = parseFloat(document.getElementById('totalWeight').value) || 0;
+            const emptyWeight = parseFloat(document.getElementById('emptyWeight').value) || 0;
+            const materialWeight = totalWeight - emptyWeight;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (totalWeight < emptyWeight && totalWeight > 0) {
+                errorMessage.style.display = 'block';
+                document.getElementById('materialWeight').value = 0;
+            } else {
+                errorMessage.style.display = 'none';
+                document.getElementById('materialWeight').value = materialWeight > 0 ? materialWeight : 0;
+            }
+        }
+
+        // Chuyển đổi định dạng ngày
+        function formatDate(dateTime) {
+            const date = new Date(dateTime);
+            return date.toLocaleDateString('vi-VN', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+        }
+
+        // Chuyển đổi định dạng thời gian
+        function formatTime(dateTime) {
+            const date = new Date(dateTime);
+            return date.toLocaleTimeString('vi-VN', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        // Chuyển đổi AM/PM
+        function getAmPm(dateTime) {
+            const date = new Date(dateTime);
+            return date.getHours() < 12 ? 'Am' : 'Pm';
+        }
+
+        // Gửi dữ liệu
+        function submitData() {
+            const timeIn = document.getElementById('timeIn').value;
+            const timeOut = document.getElementById('timeOut').value;
+            const licensePlate = document.getElementById('licensePlate').value;
+            const materialName = document.getElementById('materialName').value;
+            const emptyWeight = parseFloat(document.getElementById('emptyWeight').value);
+            const totalWeight = parseFloat(document.getElementById('totalWeight').value);
+            const materialWeight = parseFloat(document.getElementById('materialWeight').value);
+            const supervisor = document.getElementById('supervisor').value;
+
+            if (!timeIn || !timeOut || !licensePlate || !materialName || !emptyWeight || !totalWeight || !supervisor) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            if (totalWeight < emptyWeight) {
+                alert('Khối lượng tổng không được nhỏ hơn khối lượng xe không!');
+                return;
+            }
+
+            const data = {
+                timeIn,
+                timeOut,
+                licensePlate,
+                materialName,
+                emptyWeight,
+                totalWeight,
+                materialWeight,
+                supervisor
+            };
+
+            dataList.push(data);
+            lastSupervisor = supervisor;
+            
+            // Lưu dữ liệu vào localStorage
+            localStorage.setItem('dataList', JSON.stringify(dataList));
+            
+            // Reset form nhưng giữ supervisor
+            document.getElementById('timeIn').value = '';
+            document.getElementById('timeOut').value = '';
+            document.getElementById('licensePlate').value = '';
+            document.getElementById('materialName').value = '';
+            document.getElementById('emptyWeight').value = '';
+            document.getElementById('totalWeight').value = '';
+            document.getElementById('materialWeight').value = '';
+            document.getElementById('supervisor').value = lastSupervisor;
+            
+            // Cập nhật số đếm
+            document.getElementById('dataCounter').textContent = dataList.length;
+        }
+
+        // Hiển thị trang danh sách
+        function showListPage() {
+            document.getElementById('inputPage').style.display = 'none';
+            document.getElementById('listPage').style.display = 'block';
+
+            const tableBody = document.getElementById('dataTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            tableBody.innerHTML = '';
+
+            if (dataList.length === 0) {
+                noDataMessage.style.display = 'block';
+                downloadBtn.style.display = 'none';
+            } else {
+                noDataMessage.style.display = 'none';
+                downloadBtn.style.display = 'inline-block';
+
+                dataList.forEach((data, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(data.timeIn)}</td>
+                        <td>${formatTime(data.timeIn)}</td>
+                        <td>${data.licensePlate}</td>
+                        <td>${data.emptyWeight}</td>
+                        <td></td>
+                        <td>${data.materialName}</td>
+                        <td>1</td>
+                        <td>${data.totalWeight}</td>
+                        <td>${data.materialWeight}</td>
+                        <td>kg</td>
+                        <td></td>
+                        <td>${formatTime(data.timeOut)}</td>
+                        <td>${formatDate(data.timeOut)}</td>
+                        <td>${data.supervisor}</td>
+                        <td>${getAmPm(data.timeIn)}</td>
+                        <td><button class="delete-btn" onclick="deleteData(${index})">Xóa</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Xóa dữ liệu
+        function deleteData(index) {
+            if (confirm('Bạn có chắc chắn muốn xóa mã này?')) {
+                dataList.splice(index, 1);
+                localStorage.setItem('dataList', JSON.stringify(dataList));
+                showListPage();
+                document.getElementById('dataCounter').textContent = dataList.length;
+            }
+        }
+
+        // Trở về trang nhập liệu
+        function showInputPage() {
+            document.getElementById('listPage').style.display = 'none';
+            document.getElementById('inputPage').style.display = 'block';
+            document.getElementById('timeIn').value = '';
+            document.getElementById('timeOut').value = '';
+            document.getElementById('licensePlate').value = '';
+            document.getElementById('materialName').value = '';
+            document.getElementById('emptyWeight').value = '';
+            document.getElementById('totalWeight').value = '';
+            document.getElementById('materialWeight').value = '';
+            document.getElementById('supervisor').value = lastSupervisor;
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Tải xuống file Excel
+        function downloadExcel() {
+            const title = ['回废料井转登记表\nPhiếu Đăng Ký Cân Tài Chế Chất Thải'];
+            const emptyRow = [''];
+            const headers = [
+                '日期\nDate',
+                '时间进\nThời Gian Vào Cân',
+                '年号\nBiển Số Xe',
+                '空车重量\nKhối Lượng Xe Không',
+                '图像\nImage',
+                '废料名称\nTên Phế Liệu',
+                '数量\nSố lượng',
+                '总重量\nKhối Lượng Tổng',
+                '货物重量\nKhối Lượng Phế Liệu',
+                'DVD\n(Đơn Vị Đo)',
+                '图像\nImage',
+                '时间出\nThời Gian Ra',
+                '日期\nDate',
+                '导师\nNgười giám sát',
+                '上午 / 下午\nAm / Pm'
+            ];
+
+            const data = dataList.map((item) => [
+                formatDate(item.timeIn),
+                formatTime(item.timeIn),
+                item.licensePlate,
+                item.emptyWeight,
+                '',
+                item.materialName,
+                1,
+                item.totalWeight,
+                item.materialWeight,
+                'kg',
+                '',
+                formatTime(item.timeOut),
+                formatDate(item.timeOut),
+                item.supervisor,
+                getAmPm(item.timeIn)
+            ]);
+
+            // Tạo sheet với tiêu đề, dòng trống, header và dữ liệu
+            const ws = XLSX.utils.aoa_to_sheet([
+                title,
+                emptyRow,
+                headers,
+                ...data
+            ]);
+
+            // Căn giữa tiêu đề
+            ws['A1'].s = {
+                font: { bold: true, sz: 16 },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true }
+            };
+
+            // Merge ô cho tiêu đề (A1:O1)
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }];
+
+            // Đặt chiều rộng cột
+            const colWidths = headers.map(() => ({ wch: 15 }));
+            ws['!cols'] = colWidths;
+
+            // Định dạng header
+            headers.forEach((_, index) => {
+                const cell = String.fromCharCode(65 + index) + '3';
+                ws[cell].s = {
+                    font: { color: { rgb: "FFFFFF" } },
+                    fill: { fgColor: { rgb: "007BFF" } },
+                    alignment: { horizontal: "center", vertical: "center", wrapText: true }
+                };
+            });
+
+            // Định dạng dữ liệu
+            data.forEach((row, rowIndex) => {
+                row.forEach((_, colIndex) => {
+                    const cell = String.fromCharCode(65 + colIndex) + (rowIndex + 4);
+                    if (ws[cell]) {
+                        ws[cell].s = {
+                            alignment: { horizontal: "center", vertical: "center" }
+                        };
+                    }
+                });
+            });
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Danh Sách Nhập Liệu');
+            XLSX.writeFile(wb, 'Danh_Sach_Nhap_Lieu.xlsx');
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'927b9c33c9412594',t:'MTc0MzIxMTkxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
